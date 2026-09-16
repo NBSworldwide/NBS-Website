@@ -1,0 +1,31 @@
+# NBS Worldwide
+
+> Networked Business Solutions for modern websites, software, cloud services, security, integrations, and digital operations.
+
+NBS Worldwide is a Dallas–Fort Worth software development firm based in Arlington, Texas. The company helps organizations make information systems operate efficiently through practical strategy, design, engineering, and ongoing support.
+
+## Core pages
+
+- [Home](https://www.nbsworldwide.com/): NBS Worldwide overview and service introduction.
+- [About NBS Worldwide](https://www.nbsworldwide.com/about/): company background, operating philosophy, and capabilities.
+- [Services](https://www.nbsworldwide.com/services/): IT management, cloud services, data security, and integrations.
+- [Features](https://www.nbsworldwide.com/features/): software, cloud, web, product, marketing, and data-center capabilities.
+- [Selected work](https://www.nbsworldwide.com/portfolio-1/): client and portfolio partnership snapshots.
+- [Insights](https://www.nbsworldwide.com/insights/): notes on systems, websites, trust, and digital operations.
+- [FAQs](https://www.nbsworldwide.com/faqs/): common questions about websites, redesigns, support, SEO, and custom development.
+- [Testimonials](https://www.nbsworldwide.com/testimonial/): customer reviews and outcomes.
+- [Pricing](https://www.nbsworldwide.com/pricing/): published plan options and engagement starting points.
+- [Contact NBS Worldwide](https://www.nbsworldwide.com/contact/): project inquiry and newsletter forms.
+
+## Services
+
+- [IT Management](https://www.nbsworldwide.com/services/it-management/)
+- [Cloud Services](https://www.nbsworldwide.com/services/cloud-services/)
+- [Data Security](https://www.nbsworldwide.com/services/data-security/)
+- [Integrations](https://www.nbsworldwide.com/services/integrations/)
+
+## Machine-readable connections
+
+- [MCP discovery metadata](https://www.nbsworldwide.com/.well-known/mcp.json): Streamable HTTP MCP endpoint and authentication metadata.
+- [MCP endpoint](https://www.nbsworldwide.com/mcp): public context/search tools and confirmation-gated contact tools.
+- [Sitemap](https://www.nbsworldwide.com/sitemap.xml): canonical public route inventory.

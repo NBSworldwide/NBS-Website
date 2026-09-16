@@ -252,7 +252,7 @@ function Header({ activePath, cartCount }) {
     <header className="site-header">
       <div className="container header-inner">
         <a className="brand" href="/" aria-label="NBS Worldwide home">
-          <img src={media.logo} alt="NBS Worldwide" width="445" height="138" />
+          <img src={media.logoSmall} alt="NBS Worldwide" width="310" height="80" />
         </a>
         <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="primary-navigation" onClick={() => setMenuOpen((value) => !value)}>
           <span className="sr-only">Toggle navigation</span>
@@ -292,7 +292,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="container footer-top">
         <div className="footer-brand">
-          <img src={media.logo} alt="NBS Worldwide" width="445" height="138" loading="lazy" />
+          <img src={media.logoSmall} alt="NBS Worldwide" width="310" height="80" loading="lazy" />
           <p>Networked Business Solutions for any business that wants to compete in the modern business arena. Let us help.</p>
           <a className="footer-email" href={company.emailHref}>{company.email}</a>
         </div>
@@ -334,7 +334,7 @@ function Metrics() {
 }
 
 function ServiceCard({ service }) {
-  return <article className={`service-card accent-${service.accent}`}><div className="icon-badge">{service.icon}</div><h3>{service.title}</h3><p>{service.short}</p><a href={`/services/${service.slug}/`}>Explore service <Arrow /></a></article>;
+  return <article className={`service-card accent-${service.accent}`}><div className="icon-badge">{service.icon}</div><h2>{service.title}</h2><p>{service.short}</p><a href={`/services/${service.slug}/`}>Explore service <Arrow /></a></article>;
 }
 
 function HomePage() {
@@ -353,7 +353,7 @@ function HomePage() {
             <div className="visual-ring ring-large" /><div className="visual-ring ring-small" />
             <div className="hero-panel panel-main"><span className="panel-kicker">SYSTEMS / 01</span><strong>Business clarity</strong><div className="mini-chart"><i /><i /><i /><i /><i /><i /><i /></div><span className="panel-foot">+22% momentum</span></div>
             <div className="hero-panel panel-side"><span className="mini-avatar">NBS</span><strong>Connected teams</strong><span>Projects in motion</span></div>
-            <img src={media.serviceIllustration} alt="Illustrated analytics dashboard" width="768" height="553" />
+            <img src={media.serviceIllustrationMedium} srcSet={`${media.serviceIllustrationSmall} 300w, ${media.serviceIllustrationMedium} 600w`} sizes="(max-width: 560px) 80vw, (max-width: 820px) 70vw, 44vw" alt="Illustrated analytics dashboard" width="600" height="446" fetchPriority="high" />
           </div>
         </div>
         <div className="hero-wave" aria-hidden="true" />
@@ -365,13 +365,13 @@ function HomePage() {
 
       <section className="section-pad about-home">
         <div className="container split-grid align-center">
-          <div className="image-composition"><div className="image-backdrop" /><img src={media.teamPhoto} alt="A team collaborating around a screen" loading="lazy" /><span className="image-sticker">30+<small>years building<br />what works</small></span></div>
+          <div className="image-composition"><div className="image-backdrop" /><img src={media.teamPhoto} alt="Business professional working at a laptop" width="530" height="600" loading="lazy" /><span className="image-sticker">30+<small>years building<br />what works</small></span></div>
           <div className="content-column"><span className="eyebrow">ABOUT US</span><h2>We are increasing business success with technology.</h2><p>Over 25 years working in IT services developing software applications and mobile apps for clients. Located in the Dallas Metroplex, NBS Worldwide is the premier software development firm in the state of Texas.</p><p>We use intelligence, creativity, and technological expertise to design and build powerful websites, web applications, custom software, and more. We specialize in high-end web applications and sites using the latest technologies.</p><ButtonLink href="/about/" variant="outline">Meet NBS</ButtonLink></div>
         </div>
       </section>
 
       <section className="section-pad section-tint">
-        <div className="container"><SectionHeading eyebrow="WHAT WE DO" title="All kinds of IT solutions, shaped around your operation." description="The strongest digital systems are the ones your team can actually use. NBS brings strategy, design, engineering, and ongoing support into one clear path." /><div className="solution-grid">{solutions.map((solution) => <article className="solution-card" key={solution.title}><div className="solution-icon"><img src={solution.image} alt="" loading="lazy" /></div><h3>{solution.title}</h3><p>{solution.description}</p><a href="/contact/" aria-label={`Talk to NBS about ${solution.title}`}>Talk to us <Arrow /></a></article>)}</div></div>
+        <div className="container"><SectionHeading eyebrow="WHAT WE DO" title="All kinds of IT solutions, shaped around your operation." description="The strongest digital systems are the ones your team can actually use. NBS brings strategy, design, engineering, and ongoing support into one clear path." /><div className="solution-grid">{solutions.map((solution) => <article className="solution-card" key={solution.title}><div className="solution-icon"><img src={solution.image} alt="" loading="lazy" /></div><h3>{solution.title}</h3><p>{solution.description}</p><a href="/contact/">Talk to NBS about {solution.title} <Arrow /></a></article>)}</div></div>
       </section>
 
       <section className="section-pad process-section">

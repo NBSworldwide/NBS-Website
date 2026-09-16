@@ -221,6 +221,14 @@ p { color: var(--ink-soft); line-height: 1.75; }
   .service-detail-single { grid-template-columns: 1fr; gap: 45px; }
 }
 
+/* Lighthouse refinements */
+.hero-visual img { height: auto; }
+.service-card h2 { margin-bottom: 10px; font-size: 1.35rem; }
+.image-sticker { color: var(--navy); }
+.process-number, .service-index { color: #a94232; }
+.cta-inner p { color: #f2f5ff; }
+.cta-band .eyebrow-bright { color: var(--white); }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
