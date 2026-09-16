@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "nbs-worldwide/webmcp",
+  "description": "Public NBS Worldwide context and confirmation-gated contact-request tools over Streamable HTTP.",
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://www.nbsworldwide.com/mcp"
+    }
+  ],
+  "metadata": {
+    "browserApi": "document.modelContext",
+    "originPolicy": "same-origin by default; configure MCP_ALLOWED_ORIGINS for remote clients",
+    "authentication": "Bearer token when MCP_API_TOKEN is configured"
+  }
+}

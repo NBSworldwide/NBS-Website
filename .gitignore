@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+!.env.example
+APP-DATA.SQL
+APP-META.INI
+wp-config.php
+/wp-content/
+_backup/
+*.tar.gz
+lighthouse-*.json
+agentic-*.json
+*.log
