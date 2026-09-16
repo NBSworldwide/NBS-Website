@@ -252,7 +252,7 @@ function Header({ activePath, cartCount }) {
     <header className="site-header">
       <div className="container header-inner">
         <a className="brand" href="/" aria-label="NBS Worldwide home">
-          <img src={media.logo} alt="NBS Worldwide" width="375" height="80" />
+          <img src={media.logo} alt="NBS Worldwide" width="1354" height="282" />
         </a>
         <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="primary-navigation" onClick={() => setMenuOpen((value) => !value)}>
           <span className="sr-only">Toggle navigation</span>
@@ -292,7 +292,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="container footer-top">
         <div className="footer-brand">
-          <img src={media.logo} alt="NBS Worldwide" width="375" height="80" loading="lazy" />
+          <img src={media.logo} alt="NBS Worldwide" width="1354" height="282" loading="lazy" />
           <p>Networked Business Solutions for any business that wants to compete in the modern business arena. Let us help.</p>
           <a className="footer-email" href={company.emailHref}>{company.email}</a>
         </div>

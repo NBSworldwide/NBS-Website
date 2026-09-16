@@ -15,8 +15,8 @@ export const company = {
 };
 
 export const media = {
-  logo: "/wp-content/uploads/2023/03/NBS-Logo.png",
-  logoSmall: "/wp-content/uploads/2023/03/NBS-Logo-310x80.png",
+  logo: "/wp-content/uploads/cropped-NBS-Worldwide-Logo-Dark.webp",
+  logoSmall: "/wp-content/uploads/cropped-NBS-Worldwide-Logo-Dark.webp",
   favicon: "/wp-content/uploads/2023/03/FAV-2.png",
   heroBackground: "/wp-content/uploads/2023/03/home-banner.jpg",
   teamPhoto: "/wp-content/uploads/2023/03/about-img-530x600.jpg",
