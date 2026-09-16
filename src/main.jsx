@@ -2,18 +2,22 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   SITE_URL,
+  aboutHighlights,
   clients,
   company,
   faqs,
+  homeContent,
   insights,
   legacyLandingPages,
   media,
   portfolioItems,
   pricingPlans,
+  pricingFaqs,
   publicRoutes,
   primaryRoutes,
   processSteps,
   routeAliases,
+  serviceMarketingFeatures,
   services,
   shopProducts,
   solutions,
@@ -57,13 +61,17 @@ function buildSchema({ path, title, description, kind = "WebPage", service, prod
   const organizationId = `${SITE_URL}/#organization`;
   const websiteId = `${SITE_URL}/#website`;
   const localBusinessId = `${SITE_URL}/#local-business`;
+  const logoId = `${SITE_URL}/#logo`;
+  const servicesId = `${SITE_URL}/#services`;
   const serviceNodes = services.map((item) => ({
     "@type": "Service",
     "@id": `${SITE_URL}/services/${item.slug}/#service`,
+    url: `${SITE_URL}/services/${item.slug}/`,
     name: item.title,
     description: item.description,
     serviceType: item.title,
     provider: { "@id": organizationId },
+    image: `${SITE_URL}${item.image}`,
     areaServed: [
       { "@type": "City", name: company.city },
       { "@type": "State", name: company.region },
@@ -71,18 +79,26 @@ function buildSchema({ path, title, description, kind = "WebPage", service, prod
     ],
   }));
 
-  const pageType = kind === "FAQPage" ? "FAQPage" : kind === "Service" || kind === "CollectionPage" ? "CollectionPage" : kind === "Article" ? "Article" : "WebPage";
+  const pageType = kind === "Service" || kind === "CollectionPage" ? "CollectionPage" : kind === "Article" ? "Article" : "WebPage";
   const graph = [
+    {
+      "@type": "ImageObject",
+      "@id": logoId,
+      url: `${SITE_URL}${media.logo}`,
+      contentUrl: `${SITE_URL}${media.logo}`,
+      caption: `${company.name} logo`,
+    },
     {
       "@type": ["Organization", "ProfessionalService"],
       "@id": organizationId,
       name: company.name,
       alternateName: company.tagline,
       url: SITE_URL,
-      logo: { "@type": "ImageObject", url: `${SITE_URL}${media.logo}` },
+      logo: { "@id": logoId },
       description: company.description,
       telephone: company.phone,
       email: company.email,
+      foundingLocation: { "@type": "Place", name: `${company.city}, ${company.region}` },
       knowsAbout: [
         "IT management",
         "software development",
@@ -93,9 +109,13 @@ function buildSchema({ path, title, description, kind = "WebPage", service, prod
         "digital marketing",
         "SEO and SEM",
         "custom integrations",
+        "business process improvement",
+        "responsive web design",
+        "customer relationship management",
       ],
       hasOfferCatalog: {
         "@type": "OfferCatalog",
+        "@id": servicesId,
         name: "NBS Worldwide services",
         itemListElement: serviceNodes.map((item) => ({ "@type": "Offer", itemOffered: { "@id": item["@id"] } })),
       },
@@ -116,6 +136,7 @@ function buildSchema({ path, title, description, kind = "WebPage", service, prod
       url: pageUrl,
       telephone: company.phone,
       priceRange: "$$",
+      image: `${SITE_URL}${media.logo}`,
       address: {
         "@type": "PostalAddress",
         addressLocality: company.city,
@@ -148,9 +169,11 @@ function buildSchema({ path, title, description, kind = "WebPage", service, prod
       isPartOf: { "@id": websiteId },
       about: kind === "Service" && service ? { "@id": `${SITE_URL}/services/${service.slug}/#service` } : product ? { "@id": `${pageUrl}#product` } : { "@id": organizationId },
       ...(product ? { mainEntity: { "@id": `${pageUrl}#product` } } : {}),
+      ...(faqItems.length ? { mainEntity: { "@id": `${pageUrl}#faq` } } : {}),
       ...(insight ? { headline: insight.title, articleSection: insight.category, mainEntityOfPage: { "@id": pageUrl } } : {}),
       publisher: { "@id": organizationId },
       inLanguage: "en-US",
+      speakable: { "@type": "SpeakableSpecification", cssSelector: [".page-hero h1", ".page-hero p", ".section-heading h2"] },
     },
     {
       "@type": "BreadcrumbList",
@@ -184,7 +207,6 @@ function buildSchema({ path, title, description, kind = "WebPage", service, prod
         itemReviewed: { "@id": organizationId },
         author: { "@type": "Person", name: item.name },
         reviewBody: item.quote,
-        reviewRating: { "@type": "Rating", bestRating: "5", ratingValue: "5" },
       })),
     );
   }
@@ -351,7 +373,7 @@ function HomePage() {
           </div>
           <div className="hero-visual" aria-label="Illustration of connected business systems">
             <div className="visual-ring ring-large" /><div className="visual-ring ring-small" />
-            <div className="hero-panel panel-main"><span className="panel-kicker">SYSTEMS / 01</span><strong>Business clarity</strong><div className="mini-chart"><i /><i /><i /><i /><i /><i /><i /></div><span className="panel-foot">+22% momentum</span></div>
+            <div className="hero-panel panel-main"><span className="panel-kicker">SYSTEMS</span><strong>Business clarity</strong><div className="mini-chart"><i /><i /><i /><i /><i /><i /><i /></div><span className="panel-foot">+22% momentum</span></div>
             <div className="hero-panel panel-side"><span className="mini-avatar">NBS</span><strong>Connected teams</strong><span>Projects in motion</span></div>
             <img src={media.serviceIllustrationMedium} srcSet={`${media.serviceIllustrationSmall} 300w, ${media.serviceIllustrationMedium} 600w`} sizes="(max-width: 560px) 80vw, (max-width: 820px) 70vw, 44vw" alt="Illustrated analytics dashboard" width="600" height="446" fetchPriority="high" />
           </div>
@@ -366,18 +388,19 @@ function HomePage() {
       <section className="section-pad about-home">
         <div className="container split-grid align-center">
           <div className="image-composition"><div className="image-backdrop" /><img src={media.teamPhoto} alt="Business professional working at a laptop" width="530" height="600" loading="lazy" /><span className="image-sticker">30+<small>years building<br />what works</small></span></div>
-          <div className="content-column"><span className="eyebrow">ABOUT US</span><h2>We are increasing business success with technology.</h2><p>Over 25 years working in IT services developing software applications and mobile apps for clients. Located in the Dallas Metroplex, NBS Worldwide is the premier software development firm in the state of Texas.</p><p>We use intelligence, creativity, and technological expertise to design and build powerful websites, web applications, custom software, and more. We specialize in high-end web applications and sites using the latest technologies.</p><ButtonLink href="/about/" variant="outline">Meet NBS</ButtonLink></div>
+          <div className="content-column"><span className="eyebrow">ABOUT US</span><h2>{homeContent.about.heading}</h2>{homeContent.about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<p>{homeContent.about.commitment}</p><ButtonLink href="/about/" variant="outline">Learn more about NBS</ButtonLink></div>
         </div>
       </section>
 
       <section className="section-pad section-tint">
-        <div className="container"><SectionHeading eyebrow="WHAT WE DO" title="All kinds of IT solutions, shaped around your operation." description="The strongest digital systems are the ones your team can actually use. NBS brings strategy, design, engineering, and ongoing support into one clear path." /><div className="solution-grid">{solutions.map((solution) => <article className="solution-card" key={solution.title}><div className="solution-icon"><img src={solution.image} alt="" loading="lazy" /></div><h3>{solution.title}</h3><p>{solution.description}</p><a href="/contact/">Talk to NBS about {solution.title} <Arrow /></a></article>)}</div></div>
+        <div className="container"><SectionHeading eyebrow="SERVICES" title={homeContent.servicesHeading} description="NBS will help you establish long lasting relationships with your client base through innovative software and web designs that not only function flawlessly, but give your customers an immersive experience that keeps them active within your organization." /><div className="solution-grid">{solutions.map((solution) => <article className="solution-card" key={solution.title}><div className="solution-icon"><img src={solution.image} alt="" loading="lazy" /></div><h3>{solution.title}</h3><p>{solution.description}</p><a href="/contact/">Talk to NBS about {solution.title} <Arrow /></a></article>)}</div><div className="section-inline-action"><ButtonLink href="/services/" variant="outline">View all services</ButtonLink></div></div>
       </section>
 
       <section className="section-pad process-section">
-        <div className="container split-grid process-grid"><div className="content-column"><span className="eyebrow">OUR PROCESS</span><h2>Good work gets easier when the path is clear.</h2><p>We work with you to move from a broad idea to a tested, useful system. Every phase has a purpose, a shared checkpoint, and a next step you can see.</p><div className="process-list">{processSteps.map((step) => <div className="process-row" key={step.number}><span className="process-number">{step.number}</span><div><h3>{step.title}</h3><p>{step.description}</p></div></div>)}</div></div><div className="process-art"><div className="art-card"><span className="art-label">NBS / DELIVERY MAP</span><img src={media.processIllustration} alt="Illustration of a person planning work on a laptop" loading="lazy" /><div className="art-status"><span className="status-dot" /> In progress <strong>→ Delivered</strong></div></div></div></div>
+        <div className="container split-grid process-grid"><div className="content-column"><span className="eyebrow">OUR PROCESS</span><h2>Good work gets easier when the path is clear.</h2><p>We work with you to move from a broad idea to a tested, useful system. Every phase has a purpose, a shared checkpoint, and a next step you can see.</p><div className="process-list">{processSteps.map((step) => <div className="process-row" key={step.title}><div><h3>{step.title}</h3><p>{step.description}</p></div></div>)}</div></div><div className="process-art"><div className="art-card"><span className="art-label">NBS / DELIVERY MAP</span><img src={media.processIllustration} alt="Illustration of a person planning work on a laptop" loading="lazy" /><div className="art-status"><span className="status-dot" /> In progress <strong>→ Delivered</strong></div></div></div></div>
       </section>
 
+      <QuickContact />
       <TestimonialsPreview />
       <ClientsStrip />
       <CtaBand />
@@ -388,7 +411,7 @@ function HomePage() {
 function TestimonialsPreview() {
   const [active, setActive] = useState(0);
   const item = testimonials[active];
-  return <section className="section-pad testimonial-section" style={{ "--testimonial-bg": `url(${media.testimonialBackground})` }}><div className="container testimonial-grid"><div className="testimonial-copy"><span className="eyebrow">WHAT CUSTOMERS ARE SAYING</span><h2>People who already love working with NBS.</h2><blockquote>“{item.quote}”</blockquote><div className="testimonial-author"><span className="author-initials">{item.name.split(" ").map((part) => part[0]).join("")}</span><div><strong>{item.name}</strong><span>{item.role}</span></div></div><div className="testimonial-controls"><button type="button" onClick={() => setActive((active - 1 + testimonials.length) % testimonials.length)} aria-label="Previous testimonial">←</button><span>{String(active + 1).padStart(2, "0")} / {String(testimonials.length).padStart(2, "0")}</span><button type="button" onClick={() => setActive((active + 1) % testimonials.length)} aria-label="Next testimonial">→</button></div></div><div className="testimonial-art"><img src={media.quoteIllustration} alt="" aria-hidden="true" loading="lazy" /><span className="quote-mark">”</span></div></div></section>;
+  return <section className="section-pad testimonial-section" style={{ "--testimonial-bg": `url(${media.testimonialBackground})` }}><div className="container testimonial-grid"><div className="testimonial-copy"><span className="eyebrow">WHAT CUSTOMERS ARE SAYING</span><h2>People who already love working with NBS.</h2><blockquote>“{item.quote}”</blockquote><div className="testimonial-author"><span className="author-initials">{item.name.split(" ").map((part) => part[0]).join("")}</span><div><strong>{item.name}</strong><span>{item.role}</span></div></div><div className="testimonial-controls"><button type="button" onClick={() => setActive((active - 1 + testimonials.length) % testimonials.length)} aria-label="Previous testimonial">←</button><span>Customer stories</span><button type="button" onClick={() => setActive((active + 1) % testimonials.length)} aria-label="Next testimonial">→</button></div></div><div className="testimonial-art"><img src={media.quoteIllustration} alt="" aria-hidden="true" loading="lazy" /><span className="quote-mark">”</span></div></div></section>;
 }
 
 function ClientsStrip() {
@@ -399,20 +422,52 @@ function CtaBand({ title = "Have an idea or project in mind?", description = "Te
   return <section className="cta-band"><div className="container cta-inner"><div><span className="eyebrow eyebrow-bright">LET'S BUILD WHAT'S NEXT</span><h2>{title}</h2><p>{description}</p></div><ButtonLink href="/contact/" variant="light">Start a conversation</ButtonLink></div></section>;
 }
 
+function QuickContact() {
+  return <section className="section-pad section-tint quick-contact-section"><div className="container quick-contact-grid"><div className="quick-contact-copy"><span className="eyebrow">CALL US 24/7</span><h2>{homeContent.contact.heading}</h2><p>{homeContent.contact.description}</p><a className="quick-contact-phone" href={company.phoneHref}>{company.phone} <Arrow /></a><p className="quick-contact-note">For emergency technical issues or inquiries, please call. For everything else, send a note and we will reply shortly.</p></div><ContactForm compact /></div></section>;
+}
+
 function AboutPage() {
-  return <><PageHero eyebrow="ABOUT NBS WORLDWIDE" title="We help your business work for you — to make a difference." description="At NBS we pride ourselves in evaluating your current business structure and determining where improvements can be made. We implement efficient processes and streamline operations so your organization can compete in the modern business arena." image={media.aboutIllustration} accent="blue" /><section className="section-pad"><div className="container split-grid align-center"><div className="content-column"><span className="eyebrow">WHY NBS</span><h2>A technology partner with a practical point of view.</h2><p>NBS Worldwide is dedicated to providing modern, innovative solutions for any budget. We offer enterprise solutions and simple e-commerce websites — what do you need?</p><Metrics /><ButtonLink href="/contact/" variant="outline">Get started</ButtonLink></div><div className="image-composition image-composition-right"><div className="image-backdrop" /><img src={media.aboutPortrait} alt="Business professional working at a laptop" loading="lazy" /><span className="image-note">Clear thinking<br /><strong>→</strong> useful systems</span></div></div></section><section className="section-pad section-tint"><div className="container"><SectionHeading eyebrow="THE NBS DIFFERENCE" title="Why NBS is the best web solution provider for your next stage." description="Our work sits at the intersection of business structure, customer experience, and the technology that connects both." /><div className="difference-grid">{["Brand strategy", "Custom web design", "Client management tools", "Inventory management tools", "Affordable SEO / SEM solutions", "Modern CRM solutions"].map((item, index) => <div className="difference-card" key={item}><span>0{index + 1}</span><h3>{item}</h3><p>{index === 0 ? "A clear position your customers can recognize and your team can support." : index === 1 ? "Responsive, accessible experiences built around the next action." : "Practical tools that keep your people and information moving together."}</p></div>)}</div></div></section><section className="section-pad"><div className="container story-banner"><div className="story-art"><img src={media.collaborationIllustration} alt="Illustration of people collaborating on a digital workspace" loading="lazy" /></div><div><span className="eyebrow">OUR COMMITMENT</span><h2>Technology should give your people more room to do meaningful work.</h2><p>NBS takes an active interest in promoting communities, higher education, and industry cooperation. We continue to look for ways to work with third parties by supporting formal programs that contribute to those goals.</p><ButtonLink href="/services/">See how we can help</ButtonLink></div></div></section><CtaBand title="Ready to make your business work better?" /></>;
+  return <>
+    <PageHero eyebrow="ABOUT NBS WORLDWIDE" title="We help your businesses work for you to make a difference." description="At NBS we pride ourselves in being able to evaluate your current business structure and determine where improvements can be made. By implementing efficient processes and streamlining operations, we help insure your organization can compete in the modern business arena." image={media.aboutIllustration} accent="blue" />
+    <section className="section-pad">
+      <div className="container split-grid align-center">
+        <div className="content-column"><span className="eyebrow">WHY NBS</span><h2>A technology partner with a practical point of view.</h2>{homeContent.about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<Metrics /><ButtonLink href="/contact/" variant="outline">Get started</ButtonLink></div>
+        <div className="image-composition image-composition-right"><div className="image-backdrop" /><img src={media.aboutPortrait} alt="Business professional working at a laptop" loading="lazy" /><span className="image-note">Clear thinking<br /><strong>→</strong> useful systems</span></div>
+      </div>
+    </section>
+    <section className="section-pad section-tint">
+      <div className="container"><SectionHeading eyebrow="THE NBS DIFFERENCE" title="Why NBS is the best web solution provider." description="Let NBS offer the best marketing and technology solutions for your budget. NBS Worldwide is dedicated to providing you with the most modern and innovative solutions for any budget. We offer enterprise solutions and simple e-commerce websites... What do you need?" /><div className="difference-grid">{aboutHighlights.map((item) => <div className="difference-card" key={item.title}><h3>{item.title}</h3><p>{item.description}</p></div>)}</div></div>
+    </section>
+    <section className="section-pad">
+      <div className="container story-banner"><div className="story-art"><img src={media.collaborationIllustration} alt="Illustration of people collaborating on a digital workspace" loading="lazy" /></div><div><span className="eyebrow">OUR COMMITMENT</span><h2>Technology should give your people more room to do meaningful work.</h2><p>{homeContent.about.commitment}</p><ButtonLink href="/services/">See how we can help</ButtonLink></div></div>
+    </section>
+    <CtaBand title="Ready to make your business work better?" />
+  </>;
 }
 
 function ServicesPage() {
-  return <><PageHero eyebrow="OUR SERVICES" title="Build stronger relationships with your clients." description="NBS helps you establish long-lasting relationships through innovative software and web designs that function flawlessly and keep your customers active within your organization." image={media.serviceIllustration} accent="violet" /><section className="section-pad"><div className="container"><SectionHeading eyebrow="SERVICES" title="A connected team for every part of the digital operation." description="Choose the starting point that makes sense today. We can help you connect it to everything else tomorrow." /><div className="service-detail-list">{services.map((service, index) => <article className={`service-detail ${index % 2 ? "reverse" : ""}`} id={service.slug} key={service.slug}><div className={`service-detail-art accent-${service.accent}`}><img src={service.image} alt="" loading="lazy" /></div><div className="content-column"><span className="service-index">0{index + 1}</span><h2>{service.title}</h2><p>{service.description}</p><ul className="check-list"><li>Clear scope and measurable outcomes</li><li>Responsive, accessible experiences</li><li>Documentation your team can own</li></ul><a className="text-link" href="/contact/">Discuss {service.title.toLowerCase()} <Arrow /></a></div></article>)}</div></div></section><section className="section-pad section-tint"><div className="container"><SectionHeading eyebrow="SEO / SEM SERVICES" title="Visibility you can build on." description="45+ of the best tools to monitor and manage every aspect of your SEO campaigns — a practical way to dominate the SERPs and grow your traffic." /><div className="seo-feature-grid"><div className="seo-feature-art"><img src={media.seoIllustration} alt="Illustrated analytics chart" loading="lazy" /></div><div className="seo-feature-list">{["Keyword research", "Domain research", "Site management", "Rank tracking", "Analytics", "Email marketing"].map((item, index) => <div key={item}><span className="feature-number">0{index + 1}</span><div><h3>{item}</h3><p>Some great features that can improve how you manage your website and product.</p></div></div>)}</div></div></div></section><CtaBand title="Get started with NBS today." description="Start your next digital project with a free consultation." /></>;
+  return <>
+    <PageHero eyebrow="OUR SERVICES" title="Build stronger relationships with your clients." description="NBS will help you establish long lasting relationships with your client base through innovative software and web designs that not only function flawlessly, but give your customers an immersive experience that keeps them active within your organization." image={media.serviceIllustration} accent="violet" />
+    <section className="section-pad">
+      <div className="container"><SectionHeading eyebrow="SERVICES" title="We are offering all kinds of IT solutions services." description="Choose the starting point that makes sense today. We can help you connect it to everything else tomorrow." /><div className="service-detail-list">{services.map((service, index) => <article className={`service-detail ${index % 2 ? "reverse" : ""}`} id={service.slug} key={service.slug}><div className={`service-detail-art accent-${service.accent}`}><img src={service.image} alt={`${service.title} illustration`} loading="lazy" /></div><div className="content-column"><h2>{service.title}</h2><p>{service.description}</p><ul className="check-list">{service.features.map((feature) => <li key={feature}>{feature}</li>)}</ul><a className="text-link" href="/contact/">Discuss {service.title.toLowerCase()} <Arrow /></a></div></article>)}</div></div>
+    </section>
+    <section className="section-pad section-tint">
+      <div className="container"><SectionHeading eyebrow="OUR SEO/SEM SERVICES" title="Visibility you can build on." description="45+ of the best tools to monitor and manage every aspect of your SEO campaigns. A must-have to dominate the SERPs and grow your traffic!" /><div className="seo-feature-grid"><div className="seo-feature-art"><img src={media.seoIllustration} alt="Illustrated analytics chart" loading="lazy" /></div><div className="seo-feature-list">{["Keyword Research", "Domain Research", "Site Management", "Rank Tracking", "Analytics", "Email Marketing"].map((item) => <div key={item}><div><h3>{item}</h3><p>Some great features that can improve your way to manage your website and product.</p></div></div>)}</div></div></div>
+    </section>
+    <section className="section-pad">
+      <div className="container"><SectionHeading eyebrow="AUDIENCE TOOLS" title="Give every customer a more useful experience." description="The original NBS service experience also highlighted the tools that help a business understand and communicate with its audience." /><div className="mini-feature-grid service-marketing-grid">{serviceMarketingFeatures.map((feature) => <div key={feature.title}><h3>{feature.title}</h3><p>{feature.description}</p></div>)}</div></div>
+    </section>
+    <TestimonialsPreview />
+    <CtaBand title="Get started with NBS today." description="Start your dream SEO tools with free consultation." />
+  </>;
 }
 
 function FeaturesPage() {
-  return <><PageHero eyebrow="FEATURES" title="The capabilities behind better digital operations." description="Bring the right mix of strategy, software, web, cloud, design, and marketing capabilities together around the work your business needs to do." image={media.seoIllustration} accent="blue" /><section className="section-pad"><div className="container"><SectionHeading eyebrow="NBS CAPABILITIES" title="Everything useful, connected in one working system." description="These are the core capabilities carried forward from the original site, shaped into a clearer path for the teams who use them." /><div className="solution-grid">{solutions.map((solution, index) => <article className="solution-card" key={solution.title}><div className="solution-icon"><img src={solution.image} alt="" loading="lazy" /></div><span className="feature-number">0{index + 1}</span><h3>{solution.title}</h3><p>{solution.description}</p><a href="/contact/">Explore the fit <Arrow /></a></article>)}</div></div></section><section className="section-pad section-tint"><div className="container split-grid align-center"><div className="content-column"><span className="eyebrow">A PRACTICAL START</span><h2>Use the feature list as a conversation starter, not a box to check.</h2><p>We can help you decide what belongs in the first release, what can wait, and how the pieces should work together once the project is live.</p><Metrics /><ButtonLink href="/contact/">Talk to NBS</ButtonLink></div><div className="image-composition image-composition-right"><div className="image-backdrop" /><img src={media.aboutPortrait} alt="Business professional working at a laptop" loading="lazy" /><span className="image-note">Less friction<br /><strong>→</strong> more momentum</span></div></div></section><CtaBand title="Want to turn capabilities into a clear plan?" /></>;
+  return <><PageHero eyebrow="FEATURES" title="The capabilities behind better digital operations." description="Bring the right mix of strategy, software, web, cloud, design, and marketing capabilities together around the work your business needs to do." image={media.seoIllustration} accent="blue" /><section className="section-pad"><div className="container"><SectionHeading eyebrow="NBS CAPABILITIES" title="Everything useful, connected in one working system." description="These are the core capabilities carried forward from the original site, shaped into a clearer path for the teams who use them." /><div className="solution-grid">{solutions.map((solution) => <article className="solution-card" key={solution.title}><div className="solution-icon"><img src={solution.image} alt="" loading="lazy" /></div><h3>{solution.title}</h3><p>{solution.description}</p><a href="/contact/">Explore the fit <Arrow /></a></article>)}</div></div></section><section className="section-pad section-tint"><div className="container split-grid align-center"><div className="content-column"><span className="eyebrow">A PRACTICAL START</span><h2>Use the feature list as a conversation starter, not a box to check.</h2><p>We can help you decide what belongs in the first release, what can wait, and how the pieces should work together once the project is live.</p><Metrics /><ButtonLink href="/contact/">Talk to NBS</ButtonLink></div><div className="image-composition image-composition-right"><div className="image-backdrop" /><img src={media.aboutPortrait} alt="Business professional working at a laptop" loading="lazy" /><span className="image-note">Less friction<br /><strong>→</strong> more momentum</span></div></div></section><CtaBand title="Want to turn capabilities into a clear plan?" /></>;
 }
 
 function ServiceDetailPage({ service }) {
-  return <><PageHero eyebrow={`NBS SERVICE / ${service.title.toUpperCase()}`} title={`${service.title} that supports the work.`} description={service.description} image={service.image} accent={service.accent} /><section className="section-pad"><div className="container service-detail-single"><div className={`service-detail-art accent-${service.accent}`}><img src={service.image} alt={`${service.title} illustration`} /></div><div className="content-column"><span className="eyebrow">WHAT YOU GET</span><h2>A useful foundation for your next move.</h2><p>{service.short} NBS brings the technical decisions, documentation, and delivery rhythm together so your team can see what is changing and why.</p><ul className="check-list"><li>Discovery grounded in your current systems</li><li>A clear plan with measurable milestones</li><li>Responsive support through launch and beyond</li></ul><ButtonLink href="/contact/">Discuss this service</ButtonLink></div></div></section><section className="section-pad section-tint"><div className="container narrow-content"><SectionHeading eyebrow="RELATED CAPABILITIES" title="Connected systems create more room to operate." description="Pair this service with the rest of the NBS toolkit when the work crosses teams, platforms, or customer touchpoints." /><div className="mini-feature-grid">{services.filter((item) => item.slug !== service.slug).map((item, index) => <a className="mini-feature-card" href={`/services/${item.slug}/`} key={item.slug}><span>0{index + 1}</span><h3>{item.title}</h3><p>{item.short}</p><Arrow /></a>)}</div></div></section><CtaBand title="Ready to make this part of your operation clearer?" /></>;
+  return <><PageHero eyebrow={`NBS SERVICE / ${service.title.toUpperCase()}`} title={`${service.title} that supports the work.`} description={service.description} image={service.image} accent={service.accent} /><section className="section-pad"><div className="container service-detail-single"><div className={`service-detail-art accent-${service.accent}`}><img src={service.image} alt={`${service.title} illustration`} /></div><div className="content-column"><span className="eyebrow">WHAT YOU GET</span><h2>A useful foundation for your next move.</h2><p>{service.short} NBS brings the technical decisions, documentation, and delivery rhythm together so your team can see what is changing and why.</p><ul className="check-list">{service.features.map((feature) => <li key={feature}>{feature}</li>)}</ul><ButtonLink href="/contact/">Discuss this service</ButtonLink></div></div></section><section className="section-pad section-tint"><div className="container narrow-content"><SectionHeading eyebrow="RELATED CAPABILITIES" title="Connected systems create more room to operate." description="Pair this service with the rest of the NBS toolkit when the work crosses teams, platforms, or customer touchpoints." /><div className="mini-feature-grid">{services.filter((item) => item.slug !== service.slug).map((item) => <a className="mini-feature-card" href={`/services/${item.slug}/`} key={item.slug}><h3>{item.title}</h3><p>{item.short}</p><Arrow /></a>)}</div></div></section><CtaBand title="Ready to make this part of your operation clearer?" /></>;
 }
 
 const emptyContact = { firstName: "", lastName: "", email: "", phone: "", service: "", message: "" };
@@ -461,7 +516,7 @@ function ContactForm({ compact = false }) {
     } finally { setSubmitting(false); }
   }
 
-  return <form id={compact ? undefined : "nbs-contact-form"} className={`contact-form ${compact ? "contact-form-compact" : ""}`} onSubmit={submit} noValidate><div className="form-heading"><span className="eyebrow">{compact ? "QUICK CONTACT" : "CONTACT NBS"}</span><h2>{compact ? "Tell us what you need." : "Let's build something useful."}</h2><p>{compact ? "A few details are enough to get the conversation started." : "Share a little about your goals and we will reply with a practical next step."}</p></div><div className="form-grid"><label><span>First name *</span><input value={form.firstName} onChange={update("firstName")} name="firstName" autoComplete="given-name" placeholder="First name" required /></label><label><span>Last name *</span><input value={form.lastName} onChange={update("lastName")} name="lastName" autoComplete="family-name" placeholder="Last name" required /></label><label><span>Email *</span><input value={form.email} onChange={update("email")} name="email" type="email" autoComplete="email" placeholder="you@company.com" required /></label><label><span>Phone</span><input value={form.phone} onChange={update("phone")} name="phone" type="tel" autoComplete="tel" placeholder="(214) 684-8509" /></label><label className="form-full"><span>What can we help with?</span><select value={form.service} onChange={update("service")} name="service"><option value="">Choose a service</option>{services.map((service) => <option key={service.slug} value={service.title}>{service.title}</option>)}<option value="Something else">Something else</option></select></label><label className="form-full"><span>Message *</span><textarea value={form.message} onChange={update("message")} name="message" rows="5" placeholder="Tell us about the project, the problem, or the opportunity." required /></label></div><div className="form-submit-row"><button className="button button-primary" disabled={submitting} type="submit">{submitting ? "Sending…" : "Submit request"} <Arrow /></button><span className="form-note">No spam. Just a useful reply.</span></div>{status.message && <p className={`form-status ${status.type}`} role="status">{status.message}</p>}</form>;
+  return <form id="nbs-contact-form" className={`contact-form ${compact ? "contact-form-compact" : ""}`} onSubmit={submit} noValidate><div className="form-heading"><span className="eyebrow">{compact ? "QUICK CONTACT" : "CONTACT NBS"}</span><h2>{compact ? "Tell us what you need." : "Let's build something useful."}</h2><p>{compact ? "A few details are enough to get the conversation started." : "Share a little about your goals and we will reply with a practical next step."}</p></div><div className="form-grid"><label><span>First name *</span><input value={form.firstName} onChange={update("firstName")} name="firstName" autoComplete="given-name" placeholder="First name" required /></label><label><span>Last name *</span><input value={form.lastName} onChange={update("lastName")} name="lastName" autoComplete="family-name" placeholder="Last name" required /></label><label><span>Email *</span><input value={form.email} onChange={update("email")} name="email" type="email" autoComplete="email" placeholder="you@company.com" required /></label><label><span>Phone</span><input value={form.phone} onChange={update("phone")} name="phone" type="tel" autoComplete="tel" placeholder="(214) 684-8509" /></label><label className="form-full"><span>What can we help with?</span><select value={form.service} onChange={update("service")} name="service"><option value="">Choose a service</option>{services.map((service) => <option key={service.slug} value={service.title}>{service.title}</option>)}<option value="Something else">Something else</option></select></label><label className="form-full"><span>Message *</span><textarea value={form.message} onChange={update("message")} name="message" rows="5" placeholder="Tell us about the project, the problem, or the opportunity." required /></label></div><div className="form-submit-row"><button className="button button-primary" disabled={submitting} type="submit">{submitting ? "Sending…" : "Submit request"} <Arrow /></button><span className="form-note">No spam. Just a useful reply.</span></div>{status.message && <p className={`form-status ${status.type}`} role="status">{status.message}</p>}</form>;
 }
 
 function NewsletterForm() {
@@ -473,8 +528,10 @@ function NewsletterForm() {
     const payload = { email, formType: "newsletter", submittedAt: new Date().toISOString() };
     try {
       const response = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      if (!response.ok) throw new Error("unavailable");
-      setStatus("You're on the list. We'll keep it useful."); setEmail("");
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || "unavailable");
+      setStatus(data.delivery === "configured" ? "You're on the list. We'll keep it useful." : "Your request is staged in this preview. Connect an email provider before launch.");
+      setEmail("");
     } catch { localStorage.setItem("nbs-newsletter-preview", email); setStatus("Saved for this preview. Connect your email provider before launch."); }
   }
   return <form className="newsletter-form" onSubmit={submit}><label className="sr-only" htmlFor="newsletter-email">Email address</label><div className="newsletter-input"><input id="newsletter-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email address" autoComplete="email" required /><button type="submit" aria-label="Subscribe to NBS updates">→</button></div>{status && <span className="newsletter-status" role="status">{status}</span>}</form>;
@@ -489,12 +546,12 @@ function FaqPage() {
 }
 
 function TestimonialPage() {
-  return <><PageHero eyebrow="CUSTOMER STORIES" title="People who already love us." description="The best proof is not a feature list. It is what becomes easier for a real team after the work is done." image={media.quoteIllustration} accent="violet" /><section className="section-pad"><div className="container"><div className="review-grid">{testimonials.map((item, index) => <article className="review-card" key={item.name}><span className="review-number">0{index + 1}</span><div className="stars" aria-label="5 out of 5 stars">★★★★★</div><blockquote>“{item.quote}”</blockquote><div className="testimonial-author"><span className="author-initials">{item.name.split(" ").map((part) => part[0]).join("")}</span><div><strong>{item.name}</strong><span>{item.role}</span></div></div></article>)}</div></div></section><CtaBand title="Have any projects?" description="Are you ready to start using NBS Worldwide as your networked business solution?" /></>;
+  return <><PageHero eyebrow="CUSTOMER STORIES" title="People who already love us." description="The best proof is not a feature list. It is what becomes easier for a real team after the work is done." image={media.quoteIllustration} accent="violet" /><section className="section-pad"><div className="container"><div className="review-grid">{testimonials.map((item) => <article className="review-card" key={item.name}><div className="stars" aria-label="Customer testimonial">★★★★★</div><blockquote>“{item.quote}”</blockquote><div className="testimonial-author"><span className="author-initials">{item.name.split(" ").map((part) => part[0]).join("")}</span><div><strong>{item.name}</strong><span>{item.role}</span></div></div></article>)}</div></div></section><CtaBand title="Have any projects?" description="Are you ready to start using NBS Worldwide as your Networked Business Solution?" /></>;
 }
 
 function PricingPage() {
   const [billing, setBilling] = useState("monthly");
-  return <><PageHero eyebrow="PRICING PLAN" title="A clear plan for the work ahead." description="Start with the level of support that fits today. Every plan is designed to keep the work visible, responsive, and useful." image={media.processIllustration} accent="blue" /><section className="section-pad pricing-section"><div className="container"><div className="billing-toggle" role="group" aria-label="Billing frequency"><button type="button" className={billing === "monthly" ? "active" : ""} onClick={() => setBilling("monthly")}>Monthly</button><button type="button" className={billing === "yearly" ? "active" : ""} onClick={() => setBilling("yearly")}>Yearly <span>Save with annual</span></button></div><div className="pricing-grid">{pricingPlans.map((plan) => <article className={`pricing-card ${plan.popular ? "popular" : ""}`} key={plan.name}>{plan.popular && <span className="popular-badge">Most popular</span>}<span className="eyebrow">{plan.name}</span><h2>{money(plan[billing])}<small> / {billing === "monthly" ? "month" : "year"}</small></h2><p>{plan.description}</p><ButtonLink href="/contact/" variant={plan.popular ? "primary" : "outline"}>Choose plan</ButtonLink><ul className="check-list">{plan.features.map((feature) => <li key={feature}>{feature}</li>)}</ul></article>)}</div></div></section><section className="section-pad section-tint"><div className="container narrow-content"><SectionHeading eyebrow="QUESTIONS & ANSWERS" title="Need something more specific?" description="NBS can shape a custom engagement around your systems, your team, and the outcomes that matter to you." /><div className="mini-faq">{faqs.slice(0, 4).map((item) => <details key={item.question}><summary>{item.question}<span>+</span></summary><p>{item.answer}</p></details>)}</div></div></section></>;
+  return <><PageHero eyebrow="PRICING PLAN" title="Our pricing plan." description="Start with the level of support that fits today. Every plan is designed to keep the work visible, responsive, and useful." image={media.processIllustration} accent="blue" /><section className="section-pad pricing-section"><div className="container"><div className="billing-toggle" role="group" aria-label="Billing frequency"><button type="button" className={billing === "monthly" ? "active" : ""} onClick={() => setBilling("monthly")}>Monthly</button><button type="button" className={billing === "yearly" ? "active" : ""} onClick={() => setBilling("yearly")}>Yearly <span>Save with annual</span></button></div><div className="pricing-grid">{pricingPlans.map((plan) => <article className={`pricing-card ${plan.popular ? "popular" : ""}`} key={plan.name}>{plan.popular && <span className="popular-badge">Most popular</span>}<span className="eyebrow">{plan.name}</span><h2>{money(plan[billing])}<small> / {billing === "monthly" ? "month" : "year"}</small></h2><p>{plan.description}</p><ButtonLink href="/contact/" variant={plan.popular ? "primary" : "outline"}>Choose plan</ButtonLink><ul className="check-list">{plan.features.map((feature) => <li key={feature}>{feature}</li>)}</ul></article>)}</div></div></section><section className="section-pad section-tint"><div className="container narrow-content"><SectionHeading eyebrow="QUESTIONS AND ANSWERS" title="Need something more specific?" description="NBS can shape a custom engagement around your systems, your team, and the outcomes that matter to you." /><div className="mini-faq">{pricingFaqs.map((item) => <details key={item.question}><summary>{item.question}<span>+</span></summary><p>{item.answer}</p></details>)}</div></div></section><CtaBand title="Have any projects?" description="Get ready to start using NBS Worldwide as your networked business solution." /></>;
 }
 
 function PortfolioPage() {
@@ -505,11 +562,13 @@ function PortfolioPage() {
 }
 
 function InsightsPage() {
-  return <><PageHero eyebrow="NBS INSIGHTS" title="Ideas for better digital operations." description="Notes on systems, websites, trust, and the choices that make digital work more useful." image={media.seoIllustration} accent="coral" /><section className="section-pad"><div className="container"><div className="insights-grid">{insights.map((item, index) => <article className="insight-card" key={item.slug}><div className={`insight-number accent-${index % 2 ? "teal" : "violet"}`}>0{index + 1}</div><span className="eyebrow">{item.category}</span><h2>{item.title}</h2><p>{item.excerpt}</p><a href={`/insights/${item.slug}/`}>Read insight <Arrow /></a></article>)}</div></div></section><CtaBand title="Want an idea grounded in your operation?" /></>;
+  const query = new URLSearchParams(window.location.search).get("q")?.trim().toLowerCase() || "";
+  const visibleInsights = query ? insights.filter((item) => `${item.title} ${item.category} ${item.excerpt}`.toLowerCase().includes(query)) : insights;
+  return <><PageHero eyebrow="NBS INSIGHTS" title="Ideas for better digital operations." description="Notes on systems, websites, trust, and the choices that make digital work more useful." image={media.seoIllustration} accent="coral" /><section className="section-pad"><div className="container">{query && <p className="search-result-note">Showing insights that match <strong>{query}</strong>.</p>}{visibleInsights.length ? <div className="insights-grid">{visibleInsights.map((item) => <article className="insight-card" key={item.slug}><span className="eyebrow">{item.category}</span><h2>{item.title}</h2><p>{item.excerpt}</p><a href={`/insights/${item.slug}/`}>Read insight <Arrow /></a></article>)}</div> : <div className="empty-state"><span className="eyebrow">NO MATCHES</span><h2>Try a different search.</h2><p>Search the NBS insights collection for a topic, category, or phrase.</p><ButtonLink href="/insights/">View all insights</ButtonLink></div>}</div></section><CtaBand title="Want an idea grounded in your operation?" /></>;
 }
 
 function InsightDetail({ item }) {
-  return <><PageHero eyebrow={item.category} title={item.title} description={item.excerpt} image={media.serviceIllustration} accent="violet" /><article className="section-pad article-page"><div className="container article-layout"><div className="article-body"><p className="lead">Digital systems create the most value when they remove uncertainty from the work around them.</p><p>NBS Worldwide works with organizations that need their technology to do more than look polished. It should make decisions clearer, reduce repeated work, and help customers and staff move forward with confidence.</p><h2>Start with the work, not the tool.</h2><p>Before a platform, campaign, or redesign, we ask what the organization is trying to make easier. That question gives the team a shared measure for the work and keeps the project connected to the business that has to live with it.</p><p>From discovery through delivery, the strongest outcomes come from small, testable steps: understand the current structure, map the friction, build the right thing, and keep the people who use it in the loop.</p><blockquote>“The right system is the one your team can understand, use, and improve.”</blockquote><p>If you are looking beyond the next feature, NBS can help you turn the bigger idea into a practical plan.</p><ButtonLink href="/contact/">Talk to NBS</ButtonLink></div><aside className="article-aside"><span className="eyebrow">KEEP EXPLORING</span>{insights.filter((candidate) => candidate.slug !== item.slug).slice(0, 3).map((candidate) => <a href={`/insights/${candidate.slug}/`} key={candidate.slug}><span>{candidate.category}</span><strong>{candidate.title}</strong><Arrow /></a>)}</aside></div></article></>;
+  return <><PageHero eyebrow={item.category} title={item.title} description={item.excerpt} image={media.serviceIllustration} accent="violet" /><article className="section-pad article-page"><div className="container article-layout"><div className="article-body"><p className="lead">{item.excerpt}</p><p>NBS Worldwide works with organizations that need their technology to do more than look polished. It should make decisions clearer, reduce repeated work, and help customers and staff move forward with confidence.</p>{(item.sections || []).map((section) => <section key={section.heading}><h2>{section.heading}</h2>{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>)}<blockquote>“The right system is the one your team can understand, use, and improve.”</blockquote><p>If you are looking beyond the next feature, NBS can help you turn the bigger idea into a practical plan.</p><ButtonLink href="/contact/">Talk to NBS</ButtonLink></div><aside className="article-aside"><span className="eyebrow">KEEP EXPLORING</span>{insights.filter((candidate) => candidate.slug !== item.slug).slice(0, 3).map((candidate) => <a href={`/insights/${candidate.slug}/`} key={candidate.slug}><span>{candidate.category}</span><strong>{candidate.title}</strong><Arrow /></a>)}</aside></div></article></>;
 }
 
 function AuthPage({ register = false }) {
@@ -521,7 +580,7 @@ function AuthPage({ register = false }) {
 }
 
 function LegacyLandingPage({ page }) {
-  return <><PageHero eyebrow="NBS WORLDWIDE / FEATURED EXPERIENCE" title={page.kicker} description={page.description} image={page.accent === "teal" ? media.collaborationIllustration : page.accent === "coral" ? media.aboutIllustration : media.serviceIllustration} accent={page.accent} /><section className="section-pad"><div className="container legacy-layout"><div className="legacy-copy"><span className="eyebrow">{page.title.toUpperCase()}</span><h2>A focused digital experience with a clear job to do.</h2><p>{page.description} NBS brings the same attention to architecture, interaction, and delivery whether the project is a customer-facing product or an internal system.</p><div className="legacy-points"><div><strong>01</strong><span>Useful by design</span></div><div><strong>02</strong><span>Clear at every step</span></div><div><strong>03</strong><span>Ready to grow with you</span></div></div><ButtonLink href="/contact/">Talk about your project</ButtonLink></div><div className="legacy-art"><img src={media.serviceIllustration} alt="Illustrated digital product dashboard" loading="lazy" /><div className="floating-tag">NBS / {page.title}</div></div></div></section><section className="section-pad section-tint"><div className="container"><SectionHeading eyebrow="HOW WE THINK" title="Strategy, creative work, and technology in the same room." description="The best results come from keeping the business goal visible while the details get built." /><div className="mini-feature-grid">{["Discover the real need", "Design the next best step", "Build for the people using it", "Deliver, learn, improve"].map((item, index) => <div key={item}><span>0{index + 1}</span><h3>{item}</h3><p>One connected phase of the NBS working process.</p></div>)}</div></div></section><CtaBand title={`Make ${page.title.toLowerCase()} work for your business.`} /></>;
+  return <><PageHero eyebrow="NBS WORLDWIDE / FEATURED EXPERIENCE" title={page.kicker} description={page.description} image={page.accent === "teal" ? media.collaborationIllustration : page.accent === "coral" ? media.aboutIllustration : media.serviceIllustration} accent={page.accent} /><section className="section-pad"><div className="container legacy-layout"><div className="legacy-copy"><span className="eyebrow">{page.title.toUpperCase()}</span><h2>A focused digital experience with a clear job to do.</h2><p>{page.description} NBS brings the same attention to architecture, interaction, and delivery whether the project is a customer-facing product or an internal system.</p><div className="legacy-points"><div><span>Useful by design</span></div><div><span>Clear at every step</span></div><div><span>Ready to grow with you</span></div></div><ButtonLink href="/contact/">Talk about your project</ButtonLink></div><div className="legacy-art"><img src={media.serviceIllustration} alt="Illustrated digital product dashboard" loading="lazy" /><div className="floating-tag">NBS / {page.title}</div></div></div></section><section className="section-pad section-tint"><div className="container"><SectionHeading eyebrow="HOW WE THINK" title="Strategy, creative work, and technology in the same room." description="The best results come from keeping the business goal visible while the details get built." /><div className="mini-feature-grid">{["Discover the real need", "Design the next best step", "Build for the people using it", "Deliver, learn, improve"].map((item) => <div key={item}><h3>{item}</h3><p>One connected phase of the NBS working process.</p></div>)}</div></div></section><CtaBand title={`Make ${page.title.toLowerCase()} work for your business.`} /></>;
 }
 
 function PrivacyPage() {

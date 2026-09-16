@@ -7,7 +7,7 @@ import { handleContactRequest } from "./lib/contact.js";
 
 const root = resolve(fileURLToPath(new URL("./dist", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
-const mime = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8", ".xml": "application/xml; charset=utf-8", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".svg": "image/svg+xml", ".webp": "image/webp", ".ico": "image/x-icon" };
+const mime = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8", ".xml": "application/xml; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".svg": "image/svg+xml", ".webp": "image/webp", ".ico": "image/x-icon" };
 
 function send(res, status, headers, body) { res.writeHead(status, headers); res.end(body); }
 function readBody(req) { return new Promise((resolveBody, reject) => { let body = ""; req.on("data", (chunk) => { body += chunk; if (body.length > 1_000_000) reject(new Error("body too large")); }); req.on("end", () => resolveBody(body)); req.on("error", reject); }); }
